@@ -1,12 +1,23 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    Hi there, welcome to Streaks!
-</body>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Streaks</title>
+        <link href="/stylesheets/style.css" rel="stylesheet" type="text/css">
+    </head>
 
-<script src="../public/javascripts/index.js"></script>
+    <body>
+        <h1>Welcome to Streaks!</h1>
+        <form class="newTargetForm-js">
+            <input type="text" id="targetName" placeholder="New Target">
+            <input type="text" id="targetDescription" placeholder="Description">
+            <button type="submit">Submit</button>
+        </form>
+        <h3>Your targets:</h3>
+        <ul class="targetList-js">
+        </ul>
+
+        <script src="/javascripts/index.js"></script>
+        
+    </body>
 </html>
