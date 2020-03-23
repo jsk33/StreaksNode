@@ -15,6 +15,8 @@ function handleSubmit(event) {
     postData(endpoint, { name: newTargetName, description: newTargetDescription })
         .then((data) => {
             console.log(data); // JSON data parsed by 'response.json()' call
+            targetList.innerHTML = '';
+            fetchTargets();
         }
     );
 
@@ -62,6 +64,31 @@ async function updateData(url = '', data = {}) {
     return await response.json(); // parses JSON response into native JavaScript objects
 }
 
+function handleDelete(event) {
+    console.log(event.target.parentNode);
+
+    // delete the target item using its id
+    const targetID = event.target.parentNode.id;
+    const endpoint = `http://localhost:8000/api/targets/${targetID}`;
+    
+    deleteData(endpoint).then((data) => {
+        console.log(data);
+        targetList.innerHTML = '';
+        fetchTargets();
+    });
+}
+
+async function deleteData(url='') {
+    // Default options are marked with *
+    const response = await fetch(url, {
+        method: 'DELETE', // *GET, POST, PUT, DELETE, etc.
+        headers: {
+          'Content-Type': 'application/json'
+        }
+    });
+    return await response.json(); // parses JSON response into native JavaScript objects
+}
+
 function renderTargets(targets) {
     // create a new list item for each target and append to the list
 
@@ -75,7 +102,7 @@ function renderTargets(targets) {
         listItem.className = target.count;
 
         deleteBtn.innerText = "❌";
-        //deleteBtn.addEventListener("click", handleDelete);
+        deleteBtn.addEventListener("click", handleDelete);
 
         completeBtn.innerText = "✅"
         completeBtn.addEventListener("click", handleComplete);
