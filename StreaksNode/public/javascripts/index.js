@@ -44,7 +44,7 @@ function handleComplete(event) {
     const targetID = event.target.parentNode.id;
     const newCount = parseInt(event.target.parentNode.className) + 1;
     const endpoint = `http://localhost:8000/api/targets/${targetID}`;
-    updateData(endpoint, [{ propName: "count", value: newCount }]).then((data) => {
+    updateData(endpoint, [{ propName: "count", value: newCount }, { propName: "status", value: true }]).then((data) => {
         console.log(data);
         targetList.innerHTML = '';
         fetchTargets();
