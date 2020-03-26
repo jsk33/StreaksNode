@@ -44,7 +44,7 @@ function handleComplete(event) {
     const targetID = event.target.parentNode.id;
     const newCount = parseInt(event.target.parentNode.className) + 1;
     const endpoint = `http://localhost:8000/api/targets/${targetID}`;
-    updateData(endpoint, [{ propName: "count", value: newCount }, { propName: "status", value: true }]).then((data) => {
+    updateData(endpoint, [{ propName: "count", value: newCount }, { propName: "due", value: new Date(new Date().setHours(48, 0, 0, 0)) }]).then((data) => {
         console.log(data);
         targetList.innerHTML = '';
         fetchTargets();
@@ -126,7 +126,26 @@ function fetchTargets() {
         })
         .then((data) => {
             targets = data;
+            checkTargets(targets);
             renderTargets(targets);
+    });
+}
+
+function checkTargets(targets) {
+    // check each target's due date
+    // if passed, set its count to zero
+    targets.forEach(target => {
+        console.log(target.due);
+        console.log(new Date().toUTCString());
+        if (new Date(target.due) < new Date()) {
+            const targetID = target._id;
+            const endpoint = `http://localhost:8000/api/targets/${targetID}`;
+            updateData(endpoint, [{ propName: "count", value: 0 }, { propName: "due", value: new Date(new Date().setHours(24, 0, 0, 0)) }])
+                .then((data) => {
+                    console.log(data);
+                    console.log("this target's streak count has been reset");
+                });
+        }
     });
 }
 
