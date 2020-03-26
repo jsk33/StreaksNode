@@ -3,22 +3,31 @@ const newTargetNameTextField = newTargetForm.querySelector("#targetName");
 const newTargetDescriptionTextField = newTargetForm.querySelector("#targetDescription");
 const targetList = document.querySelector(".targetList-js");
 
-function handleSubmit(event) {
+let targets = [];
+
+async function handleSubmit(event) {
     event.preventDefault();
 
     const newTargetName = newTargetNameTextField.value;
     const newTargetDescription = newTargetDescriptionTextField.value;
+    const endpoint = "http://localhost:8000/api/targets";
 
 
     // post to database
-    const endpoint = "http://localhost:8000/api/targets";
-    postData(endpoint, { name: newTargetName, description: newTargetDescription })
-        .then((data) => {
-            console.log(data); // JSON data parsed by 'response.json()' call
-            targetList.innerHTML = '';
-            fetchTargets();
-        }
-    );
+    // postData(endpoint, { name: newTargetName, description: newTargetDescription })
+    //     .then((data) => {
+    //         console.log(data); // JSON data parsed by 'response.json()' call
+    //         targetList.innerHTML = '';
+    //         fetchTargets();
+    //         renderTargets(targets);
+    //     }
+    // );
+
+    const postedData = await postData(endpoint, { name: newTargetName, description: newTargetDescription });
+    console.log(postedData);
+    await fetchTargets();
+    targetList.innerHTML = '';
+    renderTargets(targets);
 
     newTargetNameTextField.value = '';
     newTargetDescriptionTextField.value = '';
@@ -37,18 +46,26 @@ async function postData(url = '', data = {}) {
     return await response.json(); // parses JSON response into native JavaScript objects
 }
 
-function handleComplete(event) {
+async function handleComplete(event) {
     console.log("This item is complete. The count will increment by 1.");
 
     // update the completed target item using its id and count
-    const targetID = event.target.parentNode.id;
+    targetID = event.target.parentNode.id;
+    const endpointID = `http://localhost:8000/api/targets/${targetID}`;
     const newCount = parseInt(event.target.parentNode.className) + 1;
-    const endpoint = `http://localhost:8000/api/targets/${targetID}`;
-    updateData(endpoint, [{ propName: "count", value: newCount }, { propName: "due", value: new Date(new Date().setHours(48, 0, 0, 0)) }]).then((data) => {
-        console.log(data);
-        targetList.innerHTML = '';
-        fetchTargets();
-    });
+    
+    // updateData(endpointID, [{ propName: "count", value: newCount }, { propName: "due", value: new Date(new Date().setHours(48, 0, 0, 0)) }]).then((data) => {
+    //     console.log(data);
+    //     targetList.innerHTML = '';
+    //     fetchTargets();
+    //     renderTargets(targets);
+    // });
+
+    const updatedData = await updateData(endpointID, [{ propName: "count", value: newCount }, { propName: "due", value: new Date(new Date().setHours(48, 0, 0, 0)) }]);
+    console.log(updatedData);
+    await fetchTargets();
+    targetList.innerHTML = '';
+    renderTargets(targets);
 }
 
 async function updateData(url = '', data = {}) {
@@ -64,18 +81,23 @@ async function updateData(url = '', data = {}) {
     return await response.json(); // parses JSON response into native JavaScript objects
 }
 
-function handleDelete(event) {
-    console.log(event.target.parentNode);
-
+async function handleDelete(event) {
     // delete the target item using its id
     const targetID = event.target.parentNode.id;
-    const endpoint = `http://localhost:8000/api/targets/${targetID}`;
-    
-    deleteData(endpoint).then((data) => {
-        console.log(data);
-        targetList.innerHTML = '';
-        fetchTargets();
-    });
+    const endpointID = `http://localhost:8000/api/targets/${targetID}`;
+
+    // deleteData(endpointID).then((data) => {
+    //     console.log(data);
+    //     targetList.innerHTML = '';
+    //     fetchTargets();
+    //     renderTargets(targets);
+    // });
+
+    const deletedData = await deleteData(endpointID);
+    console.log(`${deletedData} has been deleted`);
+    await fetchTargets();
+    targetList.innerHTML = '';
+    renderTargets(targets);
 }
 
 async function deleteData(url='') {
@@ -91,7 +113,6 @@ async function deleteData(url='') {
 
 function renderTargets(targets) {
     // create a new list item for each target and append to the list
-
     targets.forEach(target => {
         const listItem = document.createElement("li");
         const deleteBtn = document.createElement("button");
@@ -114,44 +135,51 @@ function renderTargets(targets) {
         listItem.appendChild(deleteBtn);
 
         targetList.appendChild(listItem);
-    })
+    });
+
+    console.log('rendered targets');
 }
 
-function fetchTargets() {
-    let targets = [];
-    
-    fetch('http://localhost:8000/api/targets')
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
-            targets = data;
-            checkTargets(targets);
-            renderTargets(targets);
-    });
+async function fetchTargets() {
+    // gets all the target items and stores it in 'targets'
+    // fetch('http://localhost:8000/api/targets')
+    //     .then((response) => {
+    //         return response.json();
+    //     })
+    //     .then((data) => {
+    //         targets = data;
+    //         console.log(targets);
+    // });
+
+    const res = await fetch('http://localhost:8000/api/targets');
+    const data = await res.json();
+    targets = data;
+    console.log(targets);
 }
 
 function checkTargets(targets) {
-    // check each target's due date
-    // if passed, set its count to zero
+    // for each target, set its count to zero if due date has passed
     targets.forEach(target => {
-        console.log(target.due);
-        console.log(new Date().toUTCString());
         if (new Date(target.due) < new Date()) {
             const targetID = target._id;
-            const endpoint = `http://localhost:8000/api/targets/${targetID}`;
-            updateData(endpoint, [{ propName: "count", value: 0 }, { propName: "due", value: new Date(new Date().setHours(24, 0, 0, 0)) }])
+            const endpointID = `http://localhost:8000/api/targets/${targetID}`;
+            updateData(endpointID, [{ propName: "count", value: 0 }, { propName: "due", value: new Date(new Date().setHours(24, 0, 0, 0)) }])
                 .then((data) => {
                     console.log(data);
-                    console.log("this target's streak count has been reset");
+                    console.log(`${target.name}'s streak count has been reset to zero`);
                 });
         }
     });
+
+    console.log("checked targets");
 }
 
-function init() {
+async function init() {
     newTargetForm.addEventListener("submit", handleSubmit);
-    fetchTargets();
+    await fetchTargets();
+    await checkTargets(targets);
+    await fetchTargets();
+    await renderTargets(targets);
 }
 
 init();
