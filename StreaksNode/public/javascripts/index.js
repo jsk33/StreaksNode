@@ -10,7 +10,7 @@ async function handleSubmit(event) {
 
     const newTargetName = newTargetNameTextField.value;
     const newTargetDescription = newTargetDescriptionTextField.value;
-    const endpoint = "http://localhost:8000/api/targets";
+    const endpoint = "https://streaksapi.azurewebsites.net/api/targets";
 
 
     // post to database
