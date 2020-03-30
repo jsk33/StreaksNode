@@ -10,7 +10,7 @@ async function handleSubmit(event) {
 
     const newTargetName = newTargetNameTextField.value;
     const newTargetDescription = newTargetDescriptionTextField.value;
-    const endpoint = "https://streaksapi.azurewebsites.net/api/targets";
+    const endpoint = "http://localhost:8000/api/targets";
 
 
     // post to database
@@ -61,7 +61,7 @@ async function handleComplete(event) {
     //     renderTargets(targets);
     // });
 
-    const updatedData = await updateData(endpointID, [{ propName: "count", value: newCount }, { propName: "due", value: new Date(new Date().setHours(48, 0, 0, 0)) }]);
+    const updatedData = await updateData(endpointID, [{ propName: "count", value: newCount }, { propName: "due", value: "placeholder" }]);
     console.log(updatedData);
     await fetchTargets();
     targetList.innerHTML = '';
