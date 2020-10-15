@@ -10,7 +10,7 @@ async function handleSubmit(event) {
 
     const newTargetName = newTargetNameTextField.value;
     const newTargetDescription = newTargetDescriptionTextField.value;
-    const endpoint = "https://streaksapi.azurewebsites.net/api/targets";
+    const endpoint = "http://localhost:8000/api/targets";
 
 
     // post to database
@@ -38,8 +38,8 @@ async function postData(url = '', data = {}) {
     const response = await fetch(url, {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
-        'Content-Type': 'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify(data) // body data type must match "Content-Type" header
     });
@@ -51,7 +51,7 @@ async function handleComplete(event) {
 
     // update the completed target item using its id and count
     targetID = event.target.parentNode.id;
-    const endpointID = `https://streaksapi.azurewebsites.net/api/targets/${targetID}`;
+    const endpointID = `http://localhost:8000/api/targets/${targetID}`;
     const newCount = parseInt(event.target.parentNode.className) + 1;
     
     // updateData(endpointID, [{ propName: "count", value: newCount }, { propName: "due", value: new Date(new Date().setHours(48, 0, 0, 0)) }]).then((data) => {
@@ -84,7 +84,7 @@ async function updateData(url = '', data = {}) {
 async function handleDelete(event) {
     // delete the target item using its id
     const targetID = event.target.parentNode.id;
-    const endpointID = `https://streaksapi.azurewebsites.net/api/targets/${targetID}`;
+    const endpointID = `http://localhost:8000/api/targets/${targetID}`;
 
     // deleteData(endpointID).then((data) => {
     //     console.log(data);
@@ -151,7 +151,7 @@ async function fetchTargets() {
     //         console.log(targets);
     // });
 
-    const res = await fetch('https://streaksapi.azurewebsites.net/api/targets');
+    const res = await fetch('http://localhost:8000/api/targets');
     const data = await res.json();
     targets = data;
     console.log(targets);
@@ -162,7 +162,7 @@ function checkTargets(targets) {
     targets.forEach(target => {
         if (new Date(target.due) < new Date()) {
             const targetID = target._id;
-            const endpointID = `https://streaksapi.azurewebsites.net/api/targets/${targetID}`;
+            const endpointID = `http://localhost:8000/api/targets/${targetID}`;
             updateData(endpointID, [{ propName: "count", value: 0 }, { propName: "due", value: new Date(new Date().setHours(24, 0, 0, 0)) }])
                 .then((data) => {
                     console.log(data);
